@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SHA256, AES } from 'crypto-ts';
 
 @Component({
   selector: 'app-root',
@@ -9,47 +10,37 @@ export class AppComponent {
   title = 'hash';
 
   value = '';
-  rezult = '';
+  rezult: any
   text = "";
   rezult2
+  key: any = "test"
 
 
-  criptValue () {
-    this.rezult=''
+  criptValue() {
+    this.rezult
     let str = new String(this.value);
 
-    for (let i of str) {
-      console.log(i);
+    let hash = 0;
+    if (str.length == 0) return hash;
 
-      this.rezult += (this.hash()+ (i.charCodeAt(0) & 255) +this.hash());
+    for (let i = 0; i < str.length; i++) {
+      let char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
     }
 
-    str = '';
+    // let hash;
+    // for(let i = 0; i < str.length; i++) 
+    // hash = Math.imul(31, hash) + str.charCodeAt(i) | 0;
+
+    this.rezult = hash
     this.method2()
   }
 
-  hash() {
-    this.text= ''
-    let possible = "01002030405ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_*";
-    for (let j = 0; j < 10; j++) {
-      this.text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return this.text
-  }
+
 
   method2() {
-    var a = 1, c = 0, h, o;
-    if (this.value) {
-        a = 0;
-        /*jshint plusplus:false bitwise:false*/
-        for (h = this.value.length - 1; h >= 0; h--) {
-            o = this.value.charCodeAt(h);
-            a = (a<<6&268435455) + o + (o<<14);
-            c = a & 266338304;
-            a = c!==0?a^c>>21:a;
-        }
-    }
-    this.rezult2 = a
+    this.rezult2 =  AES.encrypt(this.value, this.key).toString();
   }
 
 
